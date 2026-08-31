@@ -1,0 +1,6 @@
+=== NDRUNA KEYBOARD STABLE ===
+Barre Ndruna verte permanente en haut
+Appui long A/C/E/I/O/U pour variantes françaises
+Variantes à afficher dans la partie supérieure
+Ne pas modifier la barre Ndruna
+Sun Aug 23 20:10:48 CEST 2026

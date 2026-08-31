@@ -1,0 +1,402 @@
+package com.ndruna.keyboard;
+
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.inputmethodservice.InputMethodService;
+import android.os.Handler;
+import android.view.MotionEvent;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputConnection;
+import android.widget.Button;
+import android.widget.LinearLayout;
+
+public class NdrunaKeyboardService extends InputMethodService {
+
+    private boolean shifted = true;
+    private boolean numbers = false;
+    private boolean autoCap = true;
+    private final Handler longPressHandler = new Handler();
+
+    @Override
+    public View onCreateInputView() {
+        return createKeyboard();
+    }
+
+    private View createKeyboard() {
+
+        LinearLayout keyboard = new LinearLayout(this);
+        keyboard.setOrientation(LinearLayout.VERTICAL);
+        keyboard.setPadding(3, 3, 3, 3);
+
+        addNdrunaRow(keyboard);
+
+        if (!numbers) {
+
+            addRow(keyboard,
+                    new String[]{"a","z","e","r","t","y","u","i","o","p"});
+
+            addRow(keyboard,
+                    new String[]{"q","s","d","f","g","h","j","k","l","m"});
+
+            addRow(keyboard,
+                    new String[]{"w","x","c","v","b","n","⇧","⌫"});
+
+            addBottomRow(keyboard);
+
+        } else {
+
+            addRow(keyboard,
+                    new String[]{"1","2","3","4","5","6","7","8","9","0"});
+
+            addRow(keyboard,
+                    new String[]{"@","#","€","%","&","*","+","=","-","/"});
+
+            addRow(keyboard,
+                    new String[]{"(",")","[","]","{","}",".",",","?","!"});
+
+            addNumberBottomRow(keyboard);
+        }
+
+        return keyboard;
+    }
+
+    private void addNdrunaRow(LinearLayout parent) {
+
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.VERTICAL);
+        container.setGravity(Gravity.CENTER);
+        container.setPadding(2, 2, 2, 4);
+        container.setBackgroundColor(Color.rgb(10,70,45));
+
+        parent.addView(container,
+                new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        72));
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER);
+
+        container.addView(row,
+                new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
+
+        String[] ndruna = {
+                "ɨ","ɨ́","ɨ̀","ɨ̌",
+                "ɔ","ɔ́","ɔ̀","ɔ̌",
+                "ʉ","ʉ́","ʉ̀","ʉ̌"
+        };
+
+        for (String key : ndruna) {
+
+            Button button = new Button(this);
+
+            button.setText(key);
+            button.setTextSize(14);
+            button.setTextColor(Color.WHITE);
+            button.setAllCaps(false);
+            button.setGravity(Gravity.CENTER);
+            button.setPadding(0, 0, 0, 0);
+
+            GradientDrawable bg = new GradientDrawable();
+            bg.setColor(Color.rgb(20,130,85));
+            bg.setCornerRadius(10);
+            bg.setStroke(2, Color.rgb(80,200,130));
+
+            button.setBackground(bg);
+
+            LinearLayout.LayoutParams lp =
+                    new LinearLayout.LayoutParams(
+                            0,
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            1f);
+
+            lp.setMargins(1, 1, 1, 1);
+
+            row.addView(button, lp);
+
+            button.setOnClickListener(v -> {
+
+                InputConnection ic =
+                        getCurrentInputConnection();
+
+                if (ic != null) {
+                    ic.commitText(key, 1);
+                }
+            });
+        }
+    }
+
+    private void addRow(LinearLayout parent, String[] keys) {
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+
+        parent.addView(row,
+                new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        0,
+                        1f));
+
+        for (String key : keys) {
+            addKey(row, key, 1f);
+        }
+    }
+
+    private void addBottomRow(LinearLayout parent) {
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+
+        parent.addView(row,
+                new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        0,
+                        1f));
+
+        addKey(row, "123", 1.3f);
+        addKey(row, "␠", 5f);
+        addKey(row, "↵", 1.5f);
+    }
+
+    private void addNumberBottomRow(LinearLayout parent) {
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+
+        parent.addView(row,
+                new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        0,
+                        1f));
+
+        addKey(row, "ABC", 1.3f);
+        addKey(row, "␠", 4f);
+        addKey(row, "⌫", 1.3f);
+        addKey(row, "↵", 1.3f);
+    }
+
+    private void addKey(LinearLayout row, String key, float weight) {
+
+        Button button = new Button(this);
+
+        String display = key;
+
+        if (key.length() == 1 &&
+                Character.isLetter(key.charAt(0))) {
+
+            display = (shifted || autoCap)
+                    ? key.toUpperCase()
+                    : key.toLowerCase();
+        }
+
+        button.setText(display);
+            button.setTextColor(Color.WHITE);
+            button.setAllCaps(false);
+            button.setBackground(makeKeyBackground(key));
+        button.setTextSize(17);
+        button.setAllCaps(false);
+        button.setGravity(Gravity.CENTER);
+
+        row.addView(button,
+                new LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        weight));
+
+        button.setOnClickListener(v -> handleKey(key));
+    }
+
+    private GradientDrawable makeKeyBackground(String key) {
+        int color = Color.rgb(38,38,43);
+
+        if (key.equals("⇧") || key.equals("⌫") ||
+            key.equals("123") || key.equals("ABC") ||
+            key.equals("↵")) {
+            color = Color.rgb(190,95,20);
+        }
+
+        if (key.equals("␠")) {
+            color = Color.rgb(25,90,150);
+        }
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(color);
+        bg.setCornerRadius(12);
+        bg.setStroke(1, Color.rgb(80,80,85));
+        return bg;
+    }
+
+    private boolean hasVariants(String key) {
+        return key.equals("a") ||
+               key.equals("e") ||
+               key.equals("i") ||
+               key.equals("o") ||
+               key.equals("u");
+    }
+
+    private String[] getLetterVariants(String key) {
+
+        switch (key) {
+
+            case "a":
+                return new String[]{"á","à","ǎ"};
+
+            case "e":
+                return new String[]{"é","è","ě"};
+
+            case "i":
+                return new String[]{"ɨ","ɨ́","ɨ̀","ɨ̌","í","ì","ǐ"};
+
+            case "o":
+                return new String[]{"ɔ","ɔ́","ɔ̀","ɔ̌","ó","ò","ǒ"};
+
+            case "u":
+                return new String[]{"ʉ","ʉ́","ʉ̀","ʉ̌","ú","ù","ǔ"};
+
+            default:
+                return new String[]{key};
+        }
+    }
+
+    private void showLetterVariants(Button source, String key) {
+
+        String[] variants = getLetterVariants(key);
+
+        android.widget.PopupWindow popup =
+                new android.widget.PopupWindow(
+                        this);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.setPadding(4,4,4,4);
+        layout.setBackgroundColor(Color.rgb(25,25,28));
+
+        for (String variant : variants) {
+
+            Button b = new Button(this);
+            b.setText(variant);
+            b.setTextSize(18);
+            b.setTextColor(Color.WHITE);
+            b.setAllCaps(false);
+
+            layout.addView(
+                    b,
+                    new LinearLayout.LayoutParams(
+                            60, 60));
+
+            b.setOnClickListener(v -> {
+
+                InputConnection ic =
+                        getCurrentInputConnection();
+
+                if (ic != null) {
+                    ic.commitText(variant,1);
+                }
+
+                popup.dismiss();
+            });
+        }
+
+        popup.setContentView(layout);
+        popup.setWidth(
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        popup.setHeight(
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        popup.setFocusable(true);
+        popup.setOutsideTouchable(true);
+
+        popup.setBackgroundDrawable(
+                new GradientDrawable());
+
+        int[] location = new int[2];
+        source.getLocationOnScreen(location);
+
+        popup.showAtLocation(
+                source,
+                Gravity.TOP | Gravity.LEFT,
+                Math.max(0, location[0]),
+                Math.max(0, location[1] - 70));
+    }
+
+    private void handleKey(String key) {
+
+        if (key.equals("123")) {
+            numbers = true;
+            setInputView(createKeyboard());
+            return;
+        }
+
+        if (key.equals("ABC")) {
+            numbers = false;
+            setInputView(createKeyboard());
+            return;
+        }
+
+        if (key.equals("⇧")) {
+            shifted = !shifted;
+            autoCap = false;
+            setInputView(createKeyboard());
+            return;
+        }
+
+        InputConnection ic = getCurrentInputConnection();
+
+        if (ic == null) return;
+
+        if (key.equals("⌫")) {
+            ic.deleteSurroundingText(1, 0);
+            return;
+        }
+
+        if (key.equals("␠")) {
+            ic.commitText(" ", 1);
+            return;
+        }
+
+        if (key.equals("↵")) {
+            ic.commitText("\n", 1);
+            autoCap = true;
+            shifted = true;
+            setInputView(createKeyboard());
+            return;
+        }
+
+        String text = key;
+
+        if (Character.isLetter(key.charAt(0))) {
+
+            boolean useUpper = shifted || autoCap;
+
+            text = useUpper
+                    ? key.toUpperCase()
+                    : key.toLowerCase();
+
+            ic.commitText(text, 1);
+
+            // Après une lettre, retour automatique aux minuscules.
+            autoCap = false;
+            shifted = false;
+
+            setInputView(createKeyboard());
+
+            return;
+        }
+
+        ic.commitText(text, 1);
+
+        // Après . ? !, la prochaine lettre sera automatiquement
+        // en majuscule.
+        if (key.equals(".") ||
+            key.equals("?") ||
+            key.equals("!")) {
+
+            autoCap = true;
+            shifted = true;
+            setInputView(createKeyboard());
+        }
+    }
+}

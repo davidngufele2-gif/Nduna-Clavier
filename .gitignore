@@ -1,0 +1,12 @@
+.gradle/
+build/
+app/build/
+keystore.properties
+*.jks
+*.keystore
+*.bak
+*.bak_*
+*.before_*
+*.stable
+niy_html/
+niy_html.zip

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Clavier Ndruna</string>
+    <string name="ndruna_name">Ndruna / Ngiti</string>
+
+    <string name="notification_title">Clavier Ndruna</string>
+    <string name="notification_text">Activez Clavier Ndruna dans la liste des claviers</string>
+    <string name="notification_activate">Activer le clavier</string>
+    <string name="notification_channel">Clavier Ndruna</string>
+</resources>

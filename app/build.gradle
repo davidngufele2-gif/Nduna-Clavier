@@ -1,0 +1,44 @@
+plugins {
+    id 'com.android.application'
+}
+
+import java.util.Properties
+import java.io.FileInputStream
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace 'com.ndruna.keyboard'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.ndruna.keyboard'
+        minSdk 23
+        targetSdk 35
+        versionCode 2
+        versionName '1.1'
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
+    }
+
+    lint {
+        checkReleaseBuilds false
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
