@@ -108,6 +108,19 @@
            download>
             📥 Télécharger Clavier Ndruna
         </a>
+        <p id="download-count">📥 Téléchargements : ...</p>
+        <script>
+        fetch("https://api.github.com/repos/davidngufele2-gif/Nduna-Clavier/releases/tags/v1.0")
+          .then(r => r.json())
+          .then(data => {
+            const asset = data.assets.find(a => a.name === "NdrunaKeyboard-release.apk");
+            if (asset) {
+              document.getElementById("download-count").textContent =
+                "📥 Téléchargements : " + asset.download_count;
+            }
+          });
+        </script>
+        
 
         <div class="info">
             <p>✅ Gratuit</p>
