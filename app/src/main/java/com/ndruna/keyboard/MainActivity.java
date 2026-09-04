@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Gravity;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -92,55 +93,21 @@ public class MainActivity extends Activity {
         layout.addView(info);
         layout.addView(activate);
 
-        Button overlay = new Button(this);
-        overlay.setText("Autoriser la bulle Ndruna");
 
-        overlay.setOnClickListener(v -> {
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        Button changeKeyboard = new Button(this);
+        changeKeyboard.setText("🔄 Changer de clavier");
 
-                try {
-                    Intent intent =
-                            new Intent(
-                                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                    android.net.Uri.parse(
-                                            "package:" + getPackageName()
-                                    )
-                            );
+        changeKeyboard.setOnClickListener(v -> {
+            InputMethodManager imm =
+                    (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
-                    startActivity(intent);
-
-                } catch (Exception e) {
-
-                    Intent intent =
-                            new Intent(
-                                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION
-                            );
-
-                    startActivity(intent);
-                }
+            if (imm != null) {
+                imm.showInputMethodPicker();
             }
         });
 
-        Button accessibility = new Button(this);
-        accessibility.setText("♿ Autoriser la détection du clavier");
-
-        accessibility.setOnClickListener(v -> {
-
-            try {
-                Intent intent =
-                        new Intent(
-                                Settings.ACTION_ACCESSIBILITY_SETTINGS
-                        );
-
-                startActivity(intent);
-
-            } catch (Exception ignored) {
-            }
-        });
-
-        layout.addView(overlay);
-        layout.addView(accessibility);
+        layout.addView(changeKeyboard);
 
         setContentView(layout);
     }

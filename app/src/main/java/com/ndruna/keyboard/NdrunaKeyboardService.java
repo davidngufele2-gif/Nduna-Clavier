@@ -28,7 +28,9 @@ public class NdrunaKeyboardService extends InputMethodService {
 
     private boolean shifted = true;
     private boolean numbers = false;
+    private boolean extraSymbols = false;
     private boolean autoCap = true;
+    private boolean actionExecuted = false;
     private final List<Button> letterButtons = new ArrayList<>();
     private final Handler longPressHandler = new Handler();
 
@@ -80,6 +82,7 @@ public class NdrunaKeyboardService extends InputMethodService {
     @Override
     public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
+        actionExecuted = false;
 
         if (attribute != null) {
             int inputType = attribute.inputType;
@@ -117,16 +120,32 @@ public class NdrunaKeyboardService extends InputMethodService {
 
         } else {
 
-            addRow(keyboard,
-                    new String[]{"1","2","3","4","5","6","7","8","9","0"});
+            if (extraSymbols) {
 
-            addRow(keyboard,
-                    new String[]{"@","#","€","%","&","*","+","=","-","/"});
+                addRow(keyboard,
+                        new String[]{"_",":",";","'","\"","!","$","^","\\","|"});
 
-            addRow(keyboard,
-                    new String[]{"(",")","[","]","{","}",".",",","?","!"});
+                addRow(keyboard,
+                        new String[]{"`","~","<",">","«","»","…","•","°","©"});
 
-            addNumberBottomRow(keyboard);
+                addRow(keyboard,
+                        new String[]{"✓","♥","→","←","↑","↓","≈","≠","±","×"});
+
+                addNumberBottomRow(keyboard);
+
+            } else {
+
+                addRow(keyboard,
+                        new String[]{"1","2","3","4","5","6","7","8","9","0"});
+
+                addRow(keyboard,
+                        new String[]{"@","#","€","%","&","*","+","=","-","/"});
+
+                addRow(keyboard,
+                        new String[]{"(",")","[","]","{","}",".",",","?","#+="});
+
+                addNumberBottomRow(keyboard);
+            }
         }
 
         return keyboard;
@@ -678,7 +697,7 @@ public class NdrunaKeyboardService extends InputMethodService {
                         0,
                         1f));
 
-        addKey(row, "ABC", 1.3f);
+        addKey(row, extraSymbols ? "123" : "ABC", 1.3f);
         addKey(row, "␠", 4f);
         addKey(row, "⌫", 1.3f);
         addKey(row, "↵", 1.3f);
@@ -700,11 +719,51 @@ public class NdrunaKeyboardService extends InputMethodService {
         }
     }
 
+
+
+
+    private String getActionLabel() {
+        EditorInfo info = getCurrentInputEditorInfo();
+
+        if (info == null) {
+            return "↵";
+        }
+
+        int action = info.imeOptions & EditorInfo.IME_MASK_ACTION;
+
+        switch (action) {
+            case EditorInfo.IME_ACTION_SEARCH:
+                return "🔍";
+
+            case EditorInfo.IME_ACTION_DONE:
+                return "OK";
+
+            case EditorInfo.IME_ACTION_GO:
+                return "→";
+
+            case EditorInfo.IME_ACTION_SEND:
+                return "➤";
+
+            case EditorInfo.IME_ACTION_NEXT:
+                return "→|";
+
+            case EditorInfo.IME_ACTION_PREVIOUS:
+                return "|←";
+
+            default:
+                return "↵";
+        }
+    }
+
     private void addKey(LinearLayout row, String key, float weight) {
 
         Button button = new Button(this);
 
         String display = key;
+
+        if (key.equals("↵")) {
+            display = getActionLabel();
+        }
 
         if (key.length() == 1 &&
                 Character.isLetter(key.charAt(0))) {
@@ -720,7 +779,7 @@ public class NdrunaKeyboardService extends InputMethodService {
             button.setTag(key);
             letterButtons.add(button);
         }
-        button.setTextSize(17);
+        button.setTextSize(key.equals("↵") && !display.equals("↵") ? 9 : 17);
         button.setTextColor(Color.WHITE);
         button.setAllCaps(false);
         button.setGravity(Gravity.CENTER);
@@ -843,6 +902,10 @@ public class NdrunaKeyboardService extends InputMethodService {
 
         if (key.equals("␠")) {
             color = Color.rgb(25,90,150);
+        }
+
+        if (key.equals("#+=")) {
+            color = Color.rgb(40,150,70);
         }
 
         GradientDrawable bg = new GradientDrawable();
@@ -998,12 +1061,21 @@ public class NdrunaKeyboardService extends InputMethodService {
 
         if (key.equals("123")) {
             numbers = true;
+            extraSymbols = false;
             setInputView(createKeyboard());
             return;
         }
 
         if (key.equals("ABC")) {
             numbers = false;
+            extraSymbols = false;
+            setInputView(createKeyboard());
+            return;
+        }
+
+        if (key.equals("#+=")) {
+            extraSymbols = true;
+            numbers = true;
             setInputView(createKeyboard());
             return;
         }
@@ -1061,9 +1133,18 @@ public class NdrunaKeyboardService extends InputMethodService {
         }
 
         if (key.equals("↵")) {
-            ic.commitText("\n", 1);
+            int action = getCurrentInputEditorInfo().imeOptions & EditorInfo.IME_MASK_ACTION;
+
+            if (action != EditorInfo.IME_ACTION_NONE &&
+                action != EditorInfo.IME_ACTION_UNSPECIFIED) {
+                ic.performEditorAction(action);
+            } else {
+                ic.commitText("\n", 1);
+            }
+
             autoCap = true;
             shifted = true;
+            actionExecuted = true;
             setInputView(createKeyboard());
             return;
         }
@@ -1103,4 +1184,6 @@ public class NdrunaKeyboardService extends InputMethodService {
             setInputView(createKeyboard());
         }
     }
+
+
 }
