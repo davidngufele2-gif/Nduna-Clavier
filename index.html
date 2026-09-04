@@ -1,25 +1,153 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ndruna Clavier</title>
-<style>
-body{font-family:Arial,sans-serif;text-align:center;padding:30px;background:#f5f5f5}
-img{width:140px;height:140px;border-radius:28px}
-h1{font-size:30px}
-p{font-size:18px}
-.download{display:inline-block;padding:15px 25px;background:#16803c;color:white;text-decoration:none;border-radius:10px;font-size:20px;font-weight:bold}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Clavier Ndruna – Clavier pour la langue Ndruna</title>
+
+    <meta name="description"
+          content="Clavier Ndruna est un clavier Android conçu pour écrire facilement en langue Ndruna. Téléchargez gratuitement l'application.">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0a462d, #123f30);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            background: rgba(255,255,255,0.08);
+            padding: 40px 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+        .logo {
+            font-size: 70px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin: 10px 0;
+        }
+
+        .subtitle {
+            font-size: 19px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #2ea44f;
+            color: white;
+            padding: 17px 28px;
+            text-decoration: none;
+            font-size: 19px;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+        }
+
+        .download-btn:hover {
+            background: #24913f;
+        }
+
+        .info {
+            margin-top: 30px;
+            font-size: 15px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 13px;
+            opacity: 0.7;
+        }
+    </style>
+    <meta property="og:title" content="Ndruna Clavier – Clavier pour la langue Ndruna">
+    <meta property="og:description" content="Téléchargez Ndruna Clavier et écrivez facilement en langue Ndruna.">
+    <meta property="og:image" content="https://davidngufele2-gif.github.io/Nduna-Clavier/ndruna-clavier.png">
+    <meta property="og:url" content="https://davidngufele2-gif.github.io/Nduna-Clavier/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
 </head>
+
 <body>
-<img src="ndruna_icon.png" alt="Ndruna Clavier">
-<h1>Ndruna Clavier</h1>
-<p>Le clavier pour écrire facilement en langue Nduna.</p>
-<p><strong>Version 15 Pluto</strong></p>
-<a class="download" href="NdrunaKeyboard-v15-Pluto.apk">
-⬇️ Installer Ndruna Clavier v15 Pluto
-</a>
-<p>📱 Application Android Ndruna Clavier</p>
+
+    <div class="container">
+
+        <div class="logo">N</div>
+
+        <h1>Clavier Ndruna</h1>
+
+        <p class="subtitle">
+            Un clavier Android conçu pour écrire facilement
+            dans la langue Ndruna.
+        </p>
+
+        <a href="NdrunaKeyboard-release.apk"
+           class="download-btn"
+           download>
+            📥 Télécharger Clavier Ndruna
+        </a>
+        <p id="download-count">📥 Téléchargements : ...</p>
+
+        <script>
+        fetch("https://api.github.com/repos/davidngufele2-gif/Nduna-Clavier/releases?per_page=100")
+          .then(response => response.json())
+          .then(releases => {
+            let total = 0;
+
+            releases.forEach(release => {
+              release.assets.forEach(asset => {
+                if (asset.name.endsWith(".apk")) {
+                  total += asset.download_count;
+                }
+              });
+            });
+
+            document.getElementById("download-count").textContent =
+              "📥 Téléchargements : " + total;
+          })
+          .catch(() => {
+            document.getElementById("download-count").textContent =
+              "📥 Téléchargements : indisponible";
+          });
+        </script>
+        
+
+        <div class="info">
+            <p>✅ Gratuit</p>
+            <p>✅ Compatible Android</p>
+            <p>✅ Suggestions de mots Ndruna</p>
+            <p>✅ Lettres et caractères Ndruna</p>
+        </div>
+
+        <div class="footer">
+            Clavier Ndruna — Projet NdrunaKeyboard
+        </div>
+
+        <div class="creator">Créé par David Ngufele</div>
+
+    </div>
+
 </body>
 </html>
