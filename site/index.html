@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nduna Clavier</title>
+<title>Ndruna Clavier</title>
 <style>
 body{font-family:Arial,sans-serif;text-align:center;padding:30px;background:#f5f5f5}
 img{width:140px;height:140px;border-radius:28px}
@@ -13,25 +13,13 @@ p{font-size:18px}
 </style>
 </head>
 <body>
-<img src="ndruna_icon.png" alt="Nduna Clavier">
-<h1>Nduna Clavier</h1>
+<img src="ndruna_icon.png" alt="Ndruna Clavier">
+<h1>Ndruna Clavier</h1>
 <p>Le clavier pour écrire facilement en langue Nduna.</p>
-<p>Version 1.0</p>
-<a class="download" href="https://github.com/davidngufele2-gif/Nduna-Clavier/releases/download/v1.0/NdrunaKeyboard-release.apk">
-⬇️ Télécharger Nduna Clavier
+<p><strong>Version 15 Pluto</strong></p>
+<a class="download" href="NdrunaKeyboard-v15-Pluto.apk">
+⬇️ Installer Ndruna Clavier v15 Pluto
 </a>
-<p id="download-count">📥 Téléchargements : ...</p>
+<p>📱 Application Android Ndruna Clavier</p>
 </body>
 </html>
-
-<script>
-fetch("https://api.github.com/repos/davidngufele2-gif/Nduna-Clavier/releases/tags/v1.0")
-  .then(r => r.json())
-  .then(data => {
-    const asset = data.assets.find(a => a.name === "NdrunaKeyboard-release.apk");
-    if (asset) {
-      document.getElementById("download-count").textContent =
-        "📥 Téléchargements : " + asset.download_count;
-    }
-  });
-</script>
